@@ -1,7 +1,7 @@
-from pulp import *
 import matplotlib.pyplot as plt
-from tqdm import tqdm
 import numpy as np
+from pulp import *
+from tqdm import tqdm
 
 # distance matrix
 D = [
@@ -110,12 +110,16 @@ def get_results(limitf2: float | int) -> tuple[float, float, list[list[float]]]:
 
 
 if __name__ == '__main__':
-    results = [get_results(i) for i in tqdm(np.linspace(0.2, 2, 1000))]
+    print(f"Current f1 score: {(np.array(A) * np.array(D)).sum()}")
+    print(f"Minimal f1 possible if everything allowed: {np.array(D).min(axis=1).sum()}")
+    MAX_LABOR_CHANGE = sum(P)
+    results = [get_results(i) for i in tqdm(np.linspace(0.2, MAX_LABOR_CHANGE, 1000))]
     points = np.array([(round(x, 3), round(y, 3)) for x, y, _ in results])
     solutions = [s for _, __, s in results]
 
     point_to_solution = {tuple(points[i]): solutions[i]
                          for i in range(len(solutions))}
+
 
     points = points[points[:, 0] >= 0].T
     pareto_points = set()
@@ -130,7 +134,7 @@ if __name__ == '__main__':
         print(point_to_solution[point])
 
     x, y = zip(*pareto_points)
-
+    
     plt.scatter(x, y)
     plt.xlabel('f1 cost')
     plt.ylabel('f2 cost')
